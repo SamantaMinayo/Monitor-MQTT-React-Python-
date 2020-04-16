@@ -1,0 +1,98 @@
+.image{
+    width: 20vh !important;
+    height: 30vh !important;
+    text-align: center;
+}
+
+.ocultar{
+  display: none !important;
+}
+
+.tamanio{
+  width: 25vh;
+  height: 20vh !important;
+  text-align: center;
+}
+
+.form{
+  margin-left: 30vh;
+}
+.progrees{
+    height: 5vh;
+    margin-left: 10vh;
+    margin-right: 5vh;
+    transform: rotate(270deg);
+    margin-top: 5vh;
+    margin-bottom: 5vh;
+}
+
+.slider{
+    margin-top: 5vh;
+}
+
+.slidera{
+    margin-top: 10vh !important;
+}
+
+.text{
+    
+    align-content: initial;
+    width: 20vh;
+}
+
+.textd{    
+  margin-left: 13vh;
+  width: 20vh;
+}
+
+.inpt{
+  margin-top: 10px;
+}
+
+.wrapper-progressbar {
+    flex: 1;
+  } 
+
+
+  input[type="text"]{
+    margin:1vh;
+    width: 30vh;
+    height: 4vh;
+    min-height: 25px !important;
+    min-width: 200px !important;
+    border-radius: 5px;
+    border-color: cornflowerblue;
+  }
+
+  input[type="password"]{
+    margin:1vh;
+    width: 30vh;
+    height: 4vh;
+    min-height: 25px !important;
+    min-width: 200px !important;
+    border-radius: 5px;
+    border-color: cornflowerblue;
+  }
+
+.boton{
+  border-radius: 10px ;
+  background-color:#2e7a7a;
+}
+  
+.conect{
+  width: 14px;
+  height: 14px;
+  background-color: greenyellow;
+  margin-top: 10px;
+  margin-left: 50%;
+  border-radius: 7px;
+}
+
+.disconect{
+  width: 14px;
+  height: 14px;
+  background-color: cadetblue;
+  margin-top: 10px;
+  margin-left: 50%;
+  border-radius: 7px;
+}

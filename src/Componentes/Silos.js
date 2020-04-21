@@ -1,5 +1,17 @@
 import React from 'react';
 import './silos.css';
+import CanvasJSReact from './canvasjs.react';
+var CanvasJSChart = CanvasJSReact.CanvasJSChart;
+var dps =[{x:0,y:0}]
+var xVal = dps.length;
+var yVal=100;
+var dpsuno =[{x:0,y:0}]
+var xValuno = dps.length;
+var yValuno=100;
+var dpsdos =[{x:0,y:0}]
+var xValdos = dps.length;
+var yValdos=100;
+var updateInterval=1000;
 
 var mqtt = require('mqtt');
 var client;
@@ -14,18 +26,39 @@ class Silos extends React.Component{
           user:'',
           passwd:'',
           tema:'',
-          port:''
+          port:'',
         };
         this.handleChange= this.handleChange.bind(this);
         this.handleConnect= this.handleConnect.bind(this);
         this.handleSuscribe= this.handleSuscribe.bind(this);
+		this.updateChart = this.updateChart.bind(this);
 
     }
-    
-    handleConnect() {
-        
+    componentDidMount() {
+		setInterval(this.updateChart, updateInterval);
+	}
+	updateChart() {
+//		yVal = yVal +  Math.round(5 + Math.random() *(-5-5));
+//		dps.push({x: xVal,y: yVal});
+//		xVal++;
+		if (dps.length >  10 ) {
+			dps.shift();
+        }
+        if (dpsuno.length >  10 ) {
+			dpsuno.shift();
+        }
+        if (dpsdos.length >  10 ) {
+			dpsdos.shift();
+		}
+        this.chart.render();
+		this.chartuno.render();
+		this.chartdos.render();
         
 
+	}
+
+    handleConnect() {
+        
         client= mqtt.connect(this.state.broker+":"+this.state.port+"/mqtt",{
             clientId: 'my-device',
             keepalive: 60, // Seconds which can be any positive number, with 0 as the default setting
@@ -39,10 +72,9 @@ class Silos extends React.Component{
             console.log("Conectado");
             document.getElementById("con").className="conect"
             document.getElementById("id_form").className="ocultar"
-            document.getElementById("desconexion").className="tamano"
-            document.getElementById("silou").className="col-md-4 image"
-            document.getElementById("silod").className="col-md-4 image"
-            document.getElementById("temper").className="col-md-4 image"
+            document.getElementById("desconexion").className="tamanio"
+            document.getElementById("monitorin").className="image"
+         
             //client.subscribe("3EyLfoLCMSY8seG/temperatura")
         })
         
@@ -54,21 +86,30 @@ class Silos extends React.Component{
 
 
         client.on('message', function (topic, message) {
-            if(topic==="3EyLfoLCMSY8seG/nivel1"){
-            document.getElementById("nivela").innerHTML="Level A: "+message.toString()+" %";
-            document.getElementById("lvla").value=message.toString();
-        
-        }
-        if(topic==="3EyLfoLCMSY8seG/nivel2"){
-            document.getElementById("nivelb").innerHTML="Level B: "+ message.toString()+" %";
-            document.getElementById("lvlb").value=message.toString();
-
-
-        }
-        if(topic==="3EyLfoLCMSY8seG/temperatura"){
-            document.getElementById("temperatura").innerHTML="Temperature: "+message.toString()+" C";
-            document.getElementById("temp").value=message.toString();
-        }
+            console.log(topic+":"+message)
+            if(topic.toString()==="3EyLfoLCMSY8seG/nivel1"){
+                document.getElementById("nivela").innerHTML="Level A: "+message.toString()+" %";
+                document.getElementById("lvla").value=message.toString();
+                yValuno = parseInt(message.toString());
+                dpsuno.push({x: xValuno,y: yValuno});
+                xValuno++;    
+                console.log("temperatura"+xValuno)
+            }else if(topic.toString()==="3EyLfoLCMSY8seG/nivel2"){
+                document.getElementById("nivelb").innerHTML="Level B: "+ message.toString()+" %";
+                document.getElementById("lvlb").value=message.toString();
+                yValdos = parseInt(message.toString());
+                dpsdos.push({x: xValdos,y: yValdos});
+                xValdos++;
+            }else if(topic.toString()==="3EyLfoLCMSY8seG/temperatura"){
+            
+                document.getElementById("temperatura").innerHTML="Temperature: "+message.toString()+" C";
+                document.getElementById("temp").value=message.toString();
+                yVal = parseInt(message.toString());
+                dps.push({x: xVal,y: yVal});
+                console.log(dps)
+                xVal++;
+            //this.chart.render();
+            }
         })
 
         client.on('disconnect',function() {
@@ -90,10 +131,58 @@ class Silos extends React.Component{
         console.log(this.state.tema);
 
     };
-
+    renderfdghj() {
+		const options = {
+			title :{
+				text: "Dynamic Line Chart"
+			},
+			data: [{
+				type: "line",
+				dataPoints : dps
+			}]
+		}
+		
+		return (
+		<div>
+			<h1>React Dynamic Line Chart</h1>
+			<CanvasJSChart options = {options} 
+				onRef={ref => this.chart = ref}
+			/>
+			{/*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/}
+		</div>
+		);
+	}
     render(){
-        return(
 
+        const options = {
+			title :{
+				text: "Temperatura"
+			},
+			data: [{
+				type: "line",
+				dataPoints : dps
+			}]
+        }
+        const optionsuno = {
+			title :{
+				text: "Silo 1"
+			},
+			data: [{
+				type: "line",
+				dataPoints : dpsuno
+			}]
+        }
+        const optionsdos = {
+			title :{
+				text: "Silo 2"
+			},
+			data: [{
+				type: "line",
+				dataPoints : dpsdos
+			}]
+		}
+        return(
+        <>
             <div >
                 <div id="conexion" className="form">
                     <div id="id_form">
@@ -124,6 +213,7 @@ class Silos extends React.Component{
 
                     </div>                        
                             </div>
+                            
                         <div className="row">
                     <div className="text">
                         <text >Password</text>
@@ -158,8 +248,11 @@ class Silos extends React.Component{
                     
                     </div>
                 </div>
+                <div id="monitorin" className="ocultar">
+                <h2>Silo A Level</h2>
                 <div className="row slidera">
-                <div id="silou" className="col-md-4 ocultar">
+
+                <div id="silou" className="col-md-6 prog">
                 <div className="textd">
                     <text id="nivela">nivel</text>
                 </div>
@@ -167,25 +260,59 @@ class Silos extends React.Component{
                     <progress  max="100" className="progrees"  value={0} id="lvla" />
                 </div>
                 </div>
-                <div id="silod" className="col-md-4 ocultar">
+
+                <div id="siloua" className="col-md-6">
+                <CanvasJSChart options = {optionsuno} 
+                    onRef={ref => this.chartuno = ref}
+                />
+                {/*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/}
+                
+		        </div>
+                </div>
+                <h2>Silo B Level</h2>
+
+                <div className="row slidera">
+                <div id="silod" className="col-md-6 prog">
                 <div className="textd">
                         <text  id="temperatura">nivel</text>
                     </div>
                 <div className="slider">
-                    <progress max="100" className="progrees" id="temp" value={0}/>
+                    <progress max="100" className="progrees" id="lvlb" value={0}/>
                 </div>
                 </div>
-                <div id="temper" className="col-md-4 ocultar" >
+
+                <div id="siloda" className="col-md-6">
+                <CanvasJSChart options = {optionsdos} 
+                    onRef={ref => this.chartdos = ref}
+                />
+                {/*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/}
+		    </div>
+
+                </div>
+                <h2>Temperatura</h2>
+
+                <div className="row slidera">
+                    <div id="temper" className="col-md-6 prog " >
                     <div className="textd">
                         <text id="nivelb" >nivel</text>
                     </div>
                     <div className="slider">
-                        <progress  max="100" className="progrees"  value={0} id="lvlb" />
+                        <progress  max="100" className="progrees"  value={0} id="temp" />
                     </div>
+                    </div>
+
+                    <div id="tempera" className="col-md-6 ">
+                    <CanvasJSChart options = {options} 
+                        onRef={ref => this.chart = ref}
+                    />
+                    {/*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/}
+		            </div>
                 </div>
-             </div>
+             
+                </div>
             <hr/>
         </div>
+        </>
   	  )
     }
 }
